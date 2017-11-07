@@ -71,16 +71,71 @@ pub enum InlineQueryResult {
     Article {
         id: String,
         title: String,
-        message_text: String,
-        //TODO
+        input_message_content: InputMessageContent,
+        // reply_markup: Option<InlineKeyboardMarkup>,
+        // url:          Option<String>,
+        // hide_url:     Option<bool>,
+        description:  Option<String>,
+        thumb_url:    Option<String>,
+        thumb_width:  Option<u16>,
+        thumb_height: Option<u16>,
     },
 }
+
 impl InlineQueryResult {
-    pub fn article(id: String, title: String, message_text: String) -> InlineQueryResult {
+
+    pub fn article(
+        id: String,
+        title: String,
+        message_text: String,
+        description: String,
+        // url: String,
+        thumb_url: String,
+        thumb_height: u16,
+        thumb_width: u16) -> InlineQueryResult {
+
+        let input_message_content = InputMessageContent{
+            message_text,
+            // ..Default::default()
+        };
+
         InlineQueryResult::Article {
             id,
             title,
-            message_text,
+            input_message_content,
+            description: Some(description),
+            thumb_url: Some(thumb_url),
+            // hide_url: None,
+            // reply_markup: None,
+            // url: Some(url),
+            thumb_height:Some(thumb_height),
+            thumb_width: Some(thumb_width),
         }
     }
 }
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct InputMessageContent {
+    message_text:             String,
+    // parse_mode:               Option<String>,
+    // disable_web_page_preview: Option<bool>,
+}
+
+// #[derive(Clone, Debug, Serialize, Default)]
+// #[serde(rename_all = "lowercase")]
+// pub struct InlineKeyboardMarkup {
+//     inline_keyboard: Vec<InlineKeyboardButton>,
+// }
+
+// #[derive(Clone, Debug, Serialize, Default)]
+// #[serde(rename_all = "lowercase")]
+// pub struct InlineKeyboardButton {
+//     text:                             String,
+//     url:                              Option<String>,
+//     callback_data:                    Option<String>,
+//     switch_inline_query:              Option<String>,
+//     switch_inline_query_current_chat: Option<String>,
+//     pay:                              Option<bool>
+//     // callback_game
+// }
