@@ -7,16 +7,19 @@ pub enum ParseMode {
     Markdown,
     Html,
 }
+
 impl ParseMode {
     fn is_text(&self) -> bool {
         *self == ParseMode::Text
     }
 }
+
 impl Default for ParseMode {
     fn default() -> ParseMode {
         ParseMode::Text
     }
 }
+
 #[derive(Clone, Debug, Serialize, Default)]
 pub struct Message {
     pub chat_id: i64,
@@ -25,7 +28,9 @@ pub struct Message {
     pub parse_mode: ParseMode,
     //TODO
 }
+
 impl Message {
+
     pub fn new(chat_id: i64, text: String) -> Message {
         Message {
             chat_id,
@@ -33,6 +38,7 @@ impl Message {
             ..Default::default()
         }
     }
+
     pub fn parse_mode(mut self, mode: ParseMode) -> Message {
         self.parse_mode = mode;
         self
@@ -49,6 +55,7 @@ pub struct AnswerInlineQuery<InlineQueryResultType: Serialize + Default> {
     pub switch_pm_text: Option<String>,
     pub switch_pm_parameter: Option<String>,
 }
+
 impl<InlineQueryResultType: Serialize + Default> AnswerInlineQuery<InlineQueryResultType> {
     pub fn new(
         inline_query_id: String,
@@ -122,20 +129,89 @@ pub struct InputMessageContent {
     // disable_web_page_preview: Option<bool>,
 }
 
-// #[derive(Clone, Debug, Serialize, Default)]
-// #[serde(rename_all = "lowercase")]
-// pub struct InlineKeyboardMarkup {
-//     inline_keyboard: Vec<InlineKeyboardButton>,
-// }
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct InlineKeyboardMarkup {
+    inline_keyboard: Vec<InlineKeyboardButton>
+}
 
-// #[derive(Clone, Debug, Serialize, Default)]
-// #[serde(rename_all = "lowercase")]
-// pub struct InlineKeyboardButton {
-//     text:                             String,
-//     url:                              Option<String>,
-//     callback_data:                    Option<String>,
-//     switch_inline_query:              Option<String>,
-//     switch_inline_query_current_chat: Option<String>,
-//     pay:                              Option<bool>
-//     // callback_game
-// }
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct InlineKeyboardButton {
+    text:                             String,
+    url:                              Option<String>,
+    callback_data:                    Option<String>,
+    switch_inline_query:              Option<String>,
+    switch_inline_query_current_chat: Option<String>,
+    pay:                              Option<bool>
+}
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct ReplyKeyboardMarkup {
+    keyboard:          Vec<Vec<KeyboardButton>>,
+    resize_keyboard:   Option<bool>,
+    one_time_keyboard: Option<bool>,
+    selective:         Option<bool>
+}
+
+impl ReplyKeyboardMarkup {
+
+    // Creates a new regular keyboard with sane defaults.
+    pub fn new(rows: Vec<KeyboardButton>) -> ReplyKeyboardMarkup {
+        ReplyKeyboardMarkup{
+            keyboard: vec![rows], 
+            resize_keyboard: Some(true),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct KeyboardButton {
+    pub text:             String,
+    pub request_contact:  Option<bool>,
+    pub request_location: Option<bool>
+}
+
+impl KeyboardButton {
+
+    pub fn new(text: String) -> KeyboardButton {
+        KeyboardButton{
+            text,
+            ..Default::default()
+        }
+    }
+}
+
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub struct Audio {
+    file_id:   String,
+    duration:  i32,
+    performer: Option<String>,
+    title:     Option<String>,
+    mime_type: Option<String>,
+    file_size: Option<i32>
+}
+
+impl Audio {
+
+    // Creates a new Audio with sane defaults.
+    pub fn new(file_id: String, duration: i32) -> Audio {
+        Audio{
+            file_id,
+            duration,
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Default)]
+pub struct AudioMessage {
+    pub chat_id: i64,
+    pub audio: String,
+    pub reply_markup: Option<ReplyKeyboardMarkup>
+}
