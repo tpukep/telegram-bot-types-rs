@@ -26,6 +26,7 @@ pub struct Message {
     pub text: String,
     #[serde(skip_serializing_if = "ParseMode::is_text")]
     pub parse_mode: ParseMode,
+    reply_markup: Option<ReplyMarkup>
     //TODO
 }
 
@@ -35,6 +36,15 @@ impl Message {
         Message {
             chat_id,
             text,
+            ..Default::default()
+        }
+    }
+
+    pub fn with_keyboard_remover(chat_id: i64, text: String) -> Message {
+        Message {
+            chat_id,
+            text,
+            reply_markup: Some(ReplyMarkup::reply_keyboard_remove()),
             ..Default::default()
         }
     }
@@ -129,10 +139,48 @@ pub struct InputMessageContent {
     // disable_web_page_preview: Option<bool>,
 }
 
-#[derive(Clone, Debug, Serialize, Default)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "lowercase")]
-pub struct InlineKeyboardMarkup {
-    inline_keyboard: Vec<InlineKeyboardButton>
+pub enum ReplyMarkup {
+    InlineKeyboardMarkup {
+        inline_keyboard: Vec<InlineKeyboardButton>
+    },
+    ReplyKeyboardMarkup {
+        keyboard:          Vec<Vec<KeyboardButton>>,
+        resize_keyboard:   Option<bool>,
+        one_time_keyboard: Option<bool>,
+        selective:         Option<bool>
+    },
+    ReplyKeyboardRemove {
+        remove_keyboard: bool,
+        selective:       Option<bool>
+    },
+    ForceReply {
+        force_reply:     bool,
+        selective:       Option<bool>
+    }
+}
+
+impl ReplyMarkup {
+
+    pub fn inline_keyboard_markup(rows: Vec<InlineKeyboardButton>) -> ReplyMarkup {
+        ReplyMarkup::InlineKeyboardMarkup{inline_keyboard: rows}
+    }
+
+
+    // Creates a new regular keyboard with sane defaults.
+    pub fn reply_keyboard_markup(rows: Vec<KeyboardButton>) -> ReplyMarkup {
+        ReplyMarkup::ReplyKeyboardMarkup{
+            keyboard:          vec![rows], 
+            resize_keyboard:   Some(true),
+            one_time_keyboard: None,
+            selective:         None
+        }
+    }
+
+    pub fn reply_keyboard_remove() -> ReplyMarkup {
+        ReplyMarkup::ReplyKeyboardRemove{remove_keyboard: true, selective: None}
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Default)]
@@ -144,27 +192,6 @@ pub struct InlineKeyboardButton {
     switch_inline_query:              Option<String>,
     switch_inline_query_current_chat: Option<String>,
     pay:                              Option<bool>
-}
-
-#[derive(Clone, Debug, Serialize, Default)]
-#[serde(rename_all = "lowercase")]
-pub struct ReplyKeyboardMarkup {
-    keyboard:          Vec<Vec<KeyboardButton>>,
-    resize_keyboard:   Option<bool>,
-    one_time_keyboard: Option<bool>,
-    selective:         Option<bool>
-}
-
-impl ReplyKeyboardMarkup {
-
-    // Creates a new regular keyboard with sane defaults.
-    pub fn new(rows: Vec<KeyboardButton>) -> ReplyKeyboardMarkup {
-        ReplyKeyboardMarkup{
-            keyboard: vec![rows], 
-            resize_keyboard: Some(true),
-            ..Default::default()
-        }
-    }
 }
 
 #[derive(Clone, Debug, Serialize, Default)]
@@ -213,5 +240,5 @@ impl Audio {
 pub struct AudioMessage {
     pub chat_id: i64,
     pub audio: String,
-    pub reply_markup: Option<ReplyKeyboardMarkup>
+    pub reply_markup: Option<ReplyMarkup>
 }
