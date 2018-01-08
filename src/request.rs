@@ -26,7 +26,8 @@ pub struct Message {
     pub text: String,
     #[serde(skip_serializing_if = "ParseMode::is_text")]
     pub parse_mode: ParseMode,
-    reply_markup: Option<ReplyMarkup>
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>
     //TODO
 }
 
@@ -140,23 +141,28 @@ pub struct InputMessageContent {
 }
 
 #[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase", untagged)]
 pub enum ReplyMarkup {
     InlineKeyboardMarkup {
         inline_keyboard: Vec<InlineKeyboardButton>
     },
     ReplyKeyboardMarkup {
         keyboard:          Vec<Vec<KeyboardButton>>,
+        #[serde(skip_serializing_if = "Option::is_none")]        
         resize_keyboard:   Option<bool>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         one_time_keyboard: Option<bool>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         selective:         Option<bool>
     },
     ReplyKeyboardRemove {
         remove_keyboard: bool,
+        #[serde(skip_serializing_if = "Option::is_none")]
         selective:       Option<bool>
     },
     ForceReply {
         force_reply:     bool,
+        #[serde(skip_serializing_if = "Option::is_none")]        
         selective:       Option<bool>
     }
 }
@@ -187,10 +193,15 @@ impl ReplyMarkup {
 #[serde(rename_all = "lowercase")]
 pub struct InlineKeyboardButton {
     text:                             String,
+    #[serde(skip_serializing_if = "Option::is_none")]        
     url:                              Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]        
     callback_data:                    Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]    
     switch_inline_query:              Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]        
     switch_inline_query_current_chat: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]        
     pay:                              Option<bool>
 }
 
@@ -198,7 +209,9 @@ pub struct InlineKeyboardButton {
 #[serde(rename_all = "lowercase")]
 pub struct KeyboardButton {
     pub text:             String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_contact:  Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_location: Option<bool>
 }
 
@@ -240,5 +253,6 @@ impl Audio {
 pub struct AudioMessage {
     pub chat_id: i64,
     pub audio: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<ReplyMarkup>
 }
